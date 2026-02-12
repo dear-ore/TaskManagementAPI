@@ -1,18 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TaskManagementAPI.Models
-
+﻿namespace TaskManagementAPI.DTOs
 {
-    public class TaskItem
+    public class TaskResponseDto
     {
         public int Id { get; set; }
-
-        [Required]
-        [MaxLength(100)]
         public string Title { get; set; }
-
-        [Required]
-        [MaxLength(500)]
         public string Description { get; set; }
         public bool IsCompleted { get; set; }
         public DateTime CreatedDate { get; set; }

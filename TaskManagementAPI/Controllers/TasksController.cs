@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models;
+using TaskManagementAPI.DTOs;
 
 namespace TaskManagementAPI.Controllers
 {
@@ -36,16 +38,27 @@ namespace TaskManagementAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateTasks([FromBody] TaskItem newTask)
+        public IActionResult CreateTasks([FromBody] CreateTaskDto newTask)
         {
-            newTask.Id = MyTasks.Any() ? MyTasks.Max(t => t.Id) + 1 : 1;
-            newTask.CreatedDate = DateTime.Now;
-            MyTasks.Add(newTask);
+            TaskItem taskObj = new TaskItem();
+            taskObj.Id = MyTasks.Any() ? MyTasks.Max(t => t.Id) + 1 : 1;
 
+            taskObj.Title = newTask.Title;
+            taskObj.IsCompleted = newTask.IsCompleted;
+            taskObj.Description = newTask.Description;
+            taskObj.CreatedDate = DateTime.Now;
+            MyTasks.Add(taskObj);
+
+            TaskResponseDto response = new TaskResponseDto();
+            response.Id = taskObj.Id;
+            response.Title = taskObj.Title;
+            response.Description = taskObj.Description;
+            response.IsCompleted = taskObj.IsCompleted;
+            response.CreatedDate = taskObj.CreatedDate;
             return CreatedAtAction(
                 nameof(GetTaskById),
-                new { id = newTask.Id },
-                newTask
+                new { id = response.Id },
+                response
             );
         }
 
