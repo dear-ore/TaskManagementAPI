@@ -20,16 +20,33 @@ namespace TaskManagementAPI.Controllers
         [HttpGet]
         public IActionResult GetAllTasks()
         {
-            return Ok(MyTasks);
+            var response = MyTasks.Select(task => new TaskResponseDto
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description,
+                IsCompleted = task.IsCompleted,
+                CreatedDate = task.CreatedDate,
+            }).ToList();
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetTaskById(int id)
         {
             var task = MyTasks.FirstOrDefault(t => t.Id == id);
+
+            var response = new TaskResponseDto();
+
             if (task != null)
             {
-                return Ok(task);
+                response.Id = task.Id;
+                response.Title = task.Title;
+                response.Description = task.Description;
+                response.IsCompleted = task.IsCompleted;
+                response.CreatedDate = task.CreatedDate;
+                return Ok(response);
             }
             else
             {
@@ -64,13 +81,12 @@ namespace TaskManagementAPI.Controllers
 
         [HttpPut("{id}")]
 
-        public IActionResult UpdateTasks(int id, [FromBody] TaskItem updatedTask)
+        public IActionResult UpdateTasks(int id, [FromBody] UpdateTaskDto updatedTask)
         {
             var existingTask = MyTasks.FirstOrDefault(t => t.Id == id);
 
             if (existingTask != null)
             {
-
                 existingTask.Title = updatedTask.Title;
                 existingTask.Description = updatedTask.Description;
                 existingTask.IsCompleted = updatedTask.IsCompleted;
