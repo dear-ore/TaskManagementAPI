@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models;
 using TaskManagementAPI.DTOs;
+using TaskManagementAPI.Data;
 
 namespace TaskManagementAPI.Controllers
 {
@@ -10,17 +11,17 @@ namespace TaskManagementAPI.Controllers
     [ApiController]
     public class TasksController : ControllerBase
     {
-        private static List<TaskItem> MyTasks = new List<TaskItem>
+        private readonly AppDbContext _context;
+
+        public TasksController(AppDbContext context)
         {
-            new TaskItem { Id = 1, Title = "Dishes", Description = "Do the dishes before 4pm", IsCompleted = false, CreatedDate = DateTime.Now },
-            new TaskItem { Id = 2, Title = "Cleaning", Description = "Clean the house", IsCompleted = false, CreatedDate = DateTime.Now },
-            new TaskItem { Id = 3, Title = "Laundry", Description = "Do laundry before dusk", IsCompleted = true, CreatedDate = DateTime.Now }
-        };
+            _context = context;
+        }
 
         [HttpGet]
         public IActionResult GetAllTasks()
         {
-            var response = MyTasks.Select(task => new TaskResponseDto
+            var response = _context.Tasks.Select(task => new TaskResponseDto
             {
                 Id = task.Id,
                 Title = task.Title,
