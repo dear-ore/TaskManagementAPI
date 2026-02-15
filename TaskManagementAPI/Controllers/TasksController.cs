@@ -36,7 +36,7 @@ namespace TaskManagementAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult GetTaskById(int id)
         {
-            var task = MyTasks.FirstOrDefault(t => t.Id == id);
+            var task = _context.Tasks.FirstOrDefault(t => t.Id == id);
 
             var response = new TaskResponseDto();
 
@@ -59,13 +59,12 @@ namespace TaskManagementAPI.Controllers
         public IActionResult CreateTasks([FromBody] CreateTaskDto newTask)
         {
             TaskItem taskObj = new TaskItem();
-            taskObj.Id = MyTasks.Any() ? MyTasks.Max(t => t.Id) + 1 : 1;
-
             taskObj.Title = newTask.Title;
             taskObj.IsCompleted = newTask.IsCompleted;
             taskObj.Description = newTask.Description;
             taskObj.CreatedDate = DateTime.Now;
-            MyTasks.Add(taskObj);
+            _context.Tasks.Add(taskObj);
+            _context.SaveChanges();
 
             TaskResponseDto response = new TaskResponseDto();
             response.Id = taskObj.Id;
@@ -84,14 +83,14 @@ namespace TaskManagementAPI.Controllers
 
         public IActionResult UpdateTasks(int id, [FromBody] UpdateTaskDto updatedTask)
         {
-            var existingTask = MyTasks.FirstOrDefault(t => t.Id == id);
+            var existingTask = _context.Tasks.FirstOrDefault(t => t.Id == id);
 
             if (existingTask != null)
             {
                 existingTask.Title = updatedTask.Title;
                 existingTask.Description = updatedTask.Description;
                 existingTask.IsCompleted = updatedTask.IsCompleted;
-
+                _context.SaveChanges();
                 return NoContent();
             }
             else
@@ -102,10 +101,11 @@ namespace TaskManagementAPI.Controllers
         
         public IActionResult DeleteTask(int id)
         {
-            var taskToDelete = MyTasks.FirstOrDefault(t => t.Id == id);
-            if (taskToDelete != null)
+            var task = _context.Tasks.FirstOrDefault(t => t.Id == id);
+            if (task != null)
             {
-                MyTasks.Remove(taskToDelete);
+                _context.Tasks.Remove(task);
+                _context.SaveChanges();
                 return NoContent();
             }
             else 
